@@ -16,24 +16,23 @@
 
 package com.google.android.flexbox;
 
-import static com.google.android.flexbox.FlexContainer.NOT_SET;
-import static com.google.android.flexbox.FlexItem.FLEX_BASIS_PERCENT_DEFAULT;
-
-import static androidx.recyclerview.widget.RecyclerView.NO_POSITION;
-
 import android.util.SparseIntArray;
 import android.view.View;
 import android.view.ViewGroup;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.annotation.VisibleForTesting;
+import androidx.core.view.MarginLayoutParamsCompat;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.annotation.VisibleForTesting;
-import androidx.core.view.MarginLayoutParamsCompat;
+import static androidx.recyclerview.widget.RecyclerView.NO_POSITION;
+import static com.google.android.flexbox.FlexContainer.NOT_SET;
+import static com.google.android.flexbox.FlexItem.FLEX_BASIS_PERCENT_DEFAULT;
 
 /**
  * Offers various calculations for Flexbox to use the common logic between the classes such as
@@ -58,7 +57,7 @@ class FlexboxHelper {
      * look for a flex line from a given view index in a constant time.
      * Key: index of the view
      * Value: index of the flex line that contains the given view
-     *
+     * <p>
      * E.g. if we have following flex lines,
      * <p>
      * FlexLine(0): itemCount 3
@@ -76,7 +75,7 @@ class FlexboxHelper {
      * Cache the measured spec. The first 32 bit represents the height measure spec, the last
      * 32 bit represents the width measure spec of each flex item.
      * E.g. an entry is created like {@code (long) heightMeasureSpec << 32 | widthMeasureSpec}
-     *
+     * <p>
      * To retrieve a widthMeasureSpec, call {@link #extractLowerInt(long)} or
      * {@link #extractHigherInt(long)} for a heightMeasureSpec.
      */
@@ -88,7 +87,7 @@ class FlexboxHelper {
      * last 32 bit represents the width of each flex item.
      * E.g. an entry is created like the following code.
      * {@code (long) view.getMeasuredHeight() << 32 | view.getMeasuredWidth()}
-     *
+     * <p>
      * To retrieve a width value, call {@link #extractLowerInt(long)} or
      * {@link #extractHigherInt(long)} for a height value.
      */
@@ -113,7 +112,7 @@ class FlexboxHelper {
      * @return an array which have the reordered indices
      */
     int[] createReorderedIndices(View viewBeforeAdded, int indexForViewBeforeAdded,
-            ViewGroup.LayoutParams paramsForViewBeforeAdded, SparseIntArray orderCache) {
+                                 ViewGroup.LayoutParams paramsForViewBeforeAdded, SparseIntArray orderCache) {
         int childCount = mFlexContainer.getFlexItemCount();
         List<Order> orders = createOrders(childCount);
         Order orderForViewToBeAdded = new Order();
@@ -193,7 +192,7 @@ class FlexboxHelper {
     }
 
     private int[] sortOrdersIntoReorderedIndices(int childCount, List<Order> orders,
-            SparseIntArray orderCache) {
+                                                 SparseIntArray orderCache) {
         Collections.sort(orders);
         orderCache.clear();
         int[] reorderedIndices = new int[childCount];
@@ -213,7 +212,7 @@ class FlexboxHelper {
      * @see #calculateFlexLines(FlexLinesResult, int, int, int, int, int, List)
      */
     void calculateHorizontalFlexLines(FlexLinesResult result, int widthMeasureSpec,
-            int heightMeasureSpec) {
+                                      int heightMeasureSpec) {
         calculateFlexLines(result, widthMeasureSpec, heightMeasureSpec, Integer.MAX_VALUE,
                 0, NO_POSITION, null);
     }
@@ -239,8 +238,8 @@ class FlexboxHelper {
      * @param existingLines     If not null, calculated flex lines will be added to this instance
      */
     void calculateHorizontalFlexLines(FlexLinesResult result, int widthMeasureSpec,
-            int heightMeasureSpec, int needsCalcAmount, int fromIndex,
-            @Nullable List<FlexLine> existingLines) {
+                                      int heightMeasureSpec, int needsCalcAmount, int fromIndex,
+                                      @Nullable List<FlexLine> existingLines) {
         calculateFlexLines(result, widthMeasureSpec, heightMeasureSpec, needsCalcAmount,
                 fromIndex, NO_POSITION, existingLines);
     }
@@ -271,7 +270,7 @@ class FlexboxHelper {
      *                          argument in addition to that
      */
     void calculateHorizontalFlexLinesToIndex(FlexLinesResult result, int widthMeasureSpec,
-            int heightMeasureSpec, int needsCalcAmount, int toIndex, List<FlexLine> existingLines) {
+                                             int heightMeasureSpec, int needsCalcAmount, int toIndex, List<FlexLine> existingLines) {
         calculateFlexLines(result, widthMeasureSpec, heightMeasureSpec, needsCalcAmount,
                 0, toIndex, existingLines);
     }
@@ -313,8 +312,8 @@ class FlexboxHelper {
      * @param existingLines     If not null, calculated flex lines will be added to this instance
      */
     void calculateVerticalFlexLines(FlexLinesResult result, int widthMeasureSpec,
-            int heightMeasureSpec, int needsCalcAmount, int fromIndex,
-            @Nullable List<FlexLine> existingLines) {
+                                    int heightMeasureSpec, int needsCalcAmount, int fromIndex,
+                                    @Nullable List<FlexLine> existingLines) {
         calculateFlexLines(result, heightMeasureSpec, widthMeasureSpec, needsCalcAmount,
                 fromIndex, NO_POSITION, existingLines);
     }
@@ -345,7 +344,7 @@ class FlexboxHelper {
      *                          argument in addition to that
      */
     void calculateVerticalFlexLinesToIndex(FlexLinesResult result, int widthMeasureSpec,
-            int heightMeasureSpec, int needsCalcAmount, int toIndex, List<FlexLine> existingLines) {
+                                           int heightMeasureSpec, int needsCalcAmount, int toIndex, List<FlexLine> existingLines) {
         calculateFlexLines(result, heightMeasureSpec, widthMeasureSpec, needsCalcAmount,
                 0, toIndex, existingLines);
     }
@@ -381,8 +380,18 @@ class FlexboxHelper {
      * @param existingLines    If not null, calculated flex lines will be added to this instance
      */
     void calculateFlexLines(FlexLinesResult result, int mainMeasureSpec,
-            int crossMeasureSpec, int needsCalcAmount, int fromIndex, int toIndex,
-            @Nullable List<FlexLine> existingLines) {
+                            int crossMeasureSpec, int needsCalcAmount, int fromIndex, int toIndex,
+                            @Nullable List<FlexLine> existingLines) {
+        List<FlexLine> flexLines;
+        if (existingLines == null) {
+            flexLines = new ArrayList<>();
+        } else {
+            flexLines = existingLines;
+        }
+
+        if (mFlexContainer.getMaxLine() != NOT_SET && mFlexContainer.getMaxLine() == flexLines.size()) {
+            return;
+        }
 
         boolean isMainHorizontal = mFlexContainer.isMainAxisDirectionHorizontal();
 
@@ -390,13 +399,6 @@ class FlexboxHelper {
         int mainSize = View.MeasureSpec.getSize(mainMeasureSpec);
 
         int childState = 0;
-
-        List<FlexLine> flexLines;
-        if (existingLines == null) {
-            flexLines = new ArrayList<>();
-        } else {
-            flexLines = existingLines;
-        }
 
         result.mFlexLines = flexLines;
 
@@ -542,6 +544,10 @@ class FlexboxHelper {
                         child.measure(childCrossMeasureSpec, childMainMeasureSpec);
                         checkSizeConstraints(child, i);
                     }
+                }
+
+                if (mFlexContainer.getMaxLine() != NOT_SET && mFlexContainer.getMaxLine() == flexLines.size()) {
+                    break;
                 }
 
                 flexLine = new FlexLine();
@@ -745,7 +751,6 @@ class FlexboxHelper {
      * in API level < 17). Thus this method needs to be used with {@link #getFlexItemMarginEndMain}
      * not to misuse the margin in RTL.
      *
-     *
      * @param flexItem         the flexItem
      * @param isMainHorizontal is the main axis horizontal
      * @return the flexItem's start margin in the main axis
@@ -818,22 +823,22 @@ class FlexboxHelper {
     /**
      * Determine if a wrap is required (add a new flex line).
      *
-     * @param view          the view being judged if the wrap required
-     * @param mode          the width or height mode along the main axis direction
-     * @param maxSize       the max size along the main axis direction
-     * @param currentLength the accumulated current length
-     * @param childLength   the length of a child view which is to be collected to the flex line
-     * @param flexItem      the LayoutParams for the view being determined whether a new flex line
-     *                      is needed
-     * @param index         the index of the view being added within the entire flex container
+     * @param view            the view being judged if the wrap required
+     * @param mode            the width or height mode along the main axis direction
+     * @param maxSize         the max size along the main axis direction
+     * @param currentLength   the accumulated current length
+     * @param childLength     the length of a child view which is to be collected to the flex line
+     * @param flexItem        the LayoutParams for the view being determined whether a new flex line
+     *                        is needed
+     * @param index           the index of the view being added within the entire flex container
      * @param indexInFlexLine the index of the view being added within the current flex line
-     * @param flexLinesSize the number of the existing flexlines size
+     * @param flexLinesSize   the number of the existing flexlines size
      * @return {@code true} if a wrap is required, {@code false} otherwise
      * @see FlexContainer#getFlexWrap()
      * @see FlexContainer#setFlexWrap(int)
      */
     private boolean isWrapRequired(View view, int mode, int maxSize, int currentLength,
-            int childLength, FlexItem flexItem, int index, int indexInFlexLine, int flexLinesSize) {
+                                   int childLength, FlexItem flexItem, int index, int indexInFlexLine, int flexLinesSize) {
         if (mFlexContainer.getFlexWrap() == FlexWrap.NOWRAP) {
             return false;
         }
@@ -841,12 +846,6 @@ class FlexboxHelper {
             return true;
         }
         if (mode == View.MeasureSpec.UNSPECIFIED) {
-            return false;
-        }
-        int maxLine = mFlexContainer.getMaxLine();
-        // Judge the condition by adding 1 to the current flexLinesSize because the flex line
-        // being computed isn't added to the flexLinesSize.
-        if (maxLine != NOT_SET && maxLine <= flexLinesSize + 1) {
             return false;
         }
         int decorationLength =
@@ -858,12 +857,12 @@ class FlexboxHelper {
     }
 
     private boolean isLastFlexItem(int childIndex, int childCount,
-            FlexLine flexLine) {
+                                   FlexLine flexLine) {
         return childIndex == childCount - 1 && flexLine.getItemCountNotGone() != 0;
     }
 
     private void addFlexLine(List<FlexLine> flexLines, FlexLine flexLine, int viewIndex,
-            int usedCrossSizeSoFar) {
+                             int usedCrossSizeSoFar) {
         flexLine.mSumCrossSizeBefore = usedCrossSizeSoFar;
         mFlexContainer.onNewFlexLineAdded(flexLine);
         flexLine.mLastIndex = viewIndex;
@@ -1006,7 +1005,7 @@ class FlexboxHelper {
      * @see FlexItem#getFlexGrow()
      */
     private void expandFlexItems(int widthMeasureSpec, int heightMeasureSpec, FlexLine flexLine,
-            int maxMainSize, int paddingAlongMainAxis, boolean calledRecursively) {
+                                 int maxMainSize, int paddingAlongMainAxis, boolean calledRecursively) {
         if (flexLine.mTotalFlexGrow <= 0 || maxMainSize < flexLine.mMainSize) {
             return;
         }
@@ -1189,7 +1188,7 @@ class FlexboxHelper {
      * @see FlexItem#getFlexShrink()
      */
     private void shrinkFlexItems(int widthMeasureSpec, int heightMeasureSpec, FlexLine flexLine,
-            int maxMainSize, int paddingAlongMainAxis, boolean calledRecursively) {
+                                 int maxMainSize, int paddingAlongMainAxis, boolean calledRecursively) {
         int sizeBeforeShrink = flexLine.mMainSize;
         if (flexLine.mTotalFlexShrink <= 0 || maxMainSize > flexLine.mMainSize) {
             return;
@@ -1356,7 +1355,7 @@ class FlexboxHelper {
     }
 
     private int getChildWidthMeasureSpecInternal(int widthMeasureSpec, FlexItem flexItem,
-            int padding) {
+                                                 int padding) {
         int childWidthMeasureSpec = mFlexContainer.getChildWidthMeasureSpec(widthMeasureSpec,
                 mFlexContainer.getPaddingLeft() + mFlexContainer.getPaddingRight() +
                         flexItem.getMarginLeft() + flexItem.getMarginRight() + padding,
@@ -1373,7 +1372,7 @@ class FlexboxHelper {
     }
 
     private int getChildHeightMeasureSpecInternal(int heightMeasureSpec, FlexItem flexItem,
-            int padding) {
+                                                  int padding) {
         int childHeightMeasureSpec = mFlexContainer.getChildHeightMeasureSpec(heightMeasureSpec,
                 mFlexContainer.getPaddingTop() + mFlexContainer.getPaddingBottom()
                         + flexItem.getMarginTop() + flexItem.getMarginBottom() + padding,
@@ -1403,7 +1402,7 @@ class FlexboxHelper {
      * @see FlexContainer#setAlignContent(int)
      */
     void determineCrossSize(int widthMeasureSpec, int heightMeasureSpec,
-            int paddingAlongCrossAxis) {
+                            int paddingAlongCrossAxis) {
         // The MeasureSpec mode along the cross axis
         int mode;
         // The MeasureSpec size along the cross axis
@@ -1546,7 +1545,7 @@ class FlexboxHelper {
     }
 
     private List<FlexLine> constructFlexLinesForAlignContentCenter(List<FlexLine> flexLines,
-            int size, int totalCrossSize) {
+                                                                   int size, int totalCrossSize) {
         int spaceAboveAndBottom = size - totalCrossSize;
         spaceAboveAndBottom = spaceAboveAndBottom / 2;
         List<FlexLine> newFlexLines = new ArrayList<>();
@@ -1736,7 +1735,7 @@ class FlexboxHelper {
      * @see FlexItem#getAlignSelf()
      */
     void layoutSingleChildHorizontal(View view, FlexLine flexLine, int left, int top, int right,
-            int bottom) {
+                                     int bottom) {
         FlexItem flexItem = (FlexItem) view.getLayoutParams();
         int alignItems = mFlexContainer.getAlignItems();
         if (flexItem.getAlignSelf() != AlignSelf.AUTO) {
@@ -1820,7 +1819,7 @@ class FlexboxHelper {
      * @see FlexItem#getAlignSelf()
      */
     void layoutSingleChildVertical(View view, FlexLine flexLine, boolean isRtl,
-            int left, int top, int right, int bottom) {
+                                   int left, int top, int right, int bottom) {
         FlexItem flexItem = (FlexItem) view.getLayoutParams();
         int alignItems = mFlexContainer.getAlignItems();
         if (flexItem.getAlignSelf() != AlignSelf.AUTO) {
@@ -1929,7 +1928,7 @@ class FlexboxHelper {
     }
 
     private void updateMeasureCache(int index, int widthMeasureSpec, int heightMeasureSpec,
-            View view) {
+                                    View view) {
         if (mMeasureSpecCache != null) {
             mMeasureSpecCache[index] = makeCombinedLong(
                     widthMeasureSpec,
@@ -1994,10 +1993,14 @@ class FlexboxHelper {
      */
     private static class Order implements Comparable<Order> {
 
-        /** {@link View}'s index */
+        /**
+         * {@link View}'s index
+         */
         int index;
 
-        /** order property in the Flexbox */
+        /**
+         * order property in the Flexbox
+         */
         int order;
 
         @Override

@@ -29,14 +29,14 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 
+import androidx.annotation.IntDef;
+import androidx.annotation.Nullable;
+import androidx.core.view.ViewCompat;
+
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.util.ArrayList;
 import java.util.List;
-
-import androidx.annotation.IntDef;
-import androidx.annotation.Nullable;
-import androidx.core.view.ViewCompat;
 
 /**
  * A layout that arranges its children in a way its attributes can be specified like the
@@ -1242,6 +1242,15 @@ public class FlexboxLayout extends ViewGroup implements FlexContainer {
             result.add(flexLine);
         }
         return result;
+    }
+
+    @Override
+    public int getTotalItemDisplayed() {
+        int total = 0;
+        for (FlexLine flexLine : mFlexLines) {
+            total += flexLine.getItemCount();
+        }
+        return total;
     }
 
     @Override

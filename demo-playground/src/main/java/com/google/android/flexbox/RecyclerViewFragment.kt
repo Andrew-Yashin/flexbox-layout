@@ -43,12 +43,14 @@ internal class RecyclerViewFragment : Fragment() {
 
         val recyclerView: RecyclerView = view.findViewById(R.id.recyclerview)
         val activity = activity as MainActivity
-        val flexboxLayoutManager = FlexboxLayoutManager(activity)
+        val flexboxLayoutManager = FlexboxLayoutManager(activity).apply {
+            maxLine = 2
+        }
         recyclerView.layoutManager = flexboxLayoutManager
         adapter = FlexItemAdapter(activity, flexboxLayoutManager)
         recyclerView.adapter = adapter
         if (savedInstanceState != null) {
-            val layoutParams : List<FlexboxLayoutManager.LayoutParams>? = savedInstanceState
+            val layoutParams: List<FlexboxLayoutManager.LayoutParams>? = savedInstanceState
                     .getParcelableArrayList(FLEX_ITEMS_KEY)
             layoutParams?.let {
                 for (i in layoutParams.indices) {
@@ -69,12 +71,15 @@ internal class RecyclerViewFragment : Fragment() {
             adapter.addItem(lp)
         }
         val removeFab: FloatingActionButton = activity.findViewById(R.id.remove_fab)
-        removeFab.setOnClickListener(View.OnClickListener {
-            if (adapter.itemCount == 0) {
-                return@OnClickListener
+        removeFab.setOnClickListener { _ ->
+            (recyclerView.layoutManager as? FlexboxLayoutManager)?.let {
+                if (it.maxLine != FlexContainer.NOT_SET) {
+                    it.maxLine = FlexContainer.NOT_SET
+                } else {
+                    it.maxLine = 2
+                }
             }
-            adapter.removeItem(adapter.itemCount - 1)
-        })
+        }
     }
 
     override fun onSaveInstanceState(outState: Bundle) {

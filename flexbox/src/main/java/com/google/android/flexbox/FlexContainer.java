@@ -298,4 +298,9 @@ interface FlexContainer {
      * @param view     the view instance
      */
     void updateViewCache(int position, View view);
+
+    /**
+     * @return total item displayed in case set max line, total maybe smaller than adapter item count
+     */
+    int getTotalItemDisplayed();
 }
